@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using BLL;
 
 namespace Api.Controllers
 {
@@ -12,22 +13,20 @@ namespace Api.Controllers
     };
 
         private readonly ILogger<WeatherForecastController> _logger;
+        private readonly ITickerService _tickerService;
 
-        public WeatherForecastController(ILogger<WeatherForecastController> logger)
+        public WeatherForecastController(ILogger<WeatherForecastController> logger,
+            ITickerService tickerService)
         {
             _logger = logger;
+            this._tickerService = tickerService;
         }
 
-        [HttpGet(Name = "GetWeatherForecast")]
-        public IEnumerable<WeatherForecast> Get()
+        [HttpGet(Name = "TickerInformation")]
+        public async Task<string> GetTickerInformation(string ticker)
         {
-            return Enumerable.Range(1, 5).Select(index => new WeatherForecast
-            {
-                Date = DateTime.Now.AddDays(index),
-                TemperatureC = Random.Shared.Next(-20, 55),
-                Summary = Summaries[Random.Shared.Next(Summaries.Length)]
-            })
-            .ToArray();
+            var tickerString = await _tickerService.GetTickerInformation(ticker).ConfigureAwait(false);
+            return tickerString;
         }
     }
 }
