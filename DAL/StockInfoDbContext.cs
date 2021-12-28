@@ -17,6 +17,14 @@ namespace DAL
         public StockInfoDbContext(DbContextOptions<StockInfoDbContext> options):base(options)
         {
         }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<TickerInfo>()
+                .Property(t => t.LatestPrice).HasPrecision(14,2);
+
+            base.OnModelCreating(modelBuilder);
+        }
     }
 
 

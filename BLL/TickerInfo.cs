@@ -8,10 +8,11 @@ namespace BLL
 {
     public class TickerInfo
     {
-        //public string Ticker { get; set; }
+        
+        public string Ticker { get; set; }
         public string StockName { get; set; }
         public string Id { get; set; }
-        //public string LatestPrice { get; set; }
-        //public string LatestPriceDate { get; set; }
+        public decimal LatestPrice { get; set; }
+        public DateTime LatestPriceDate { get; set; }
     }
 }

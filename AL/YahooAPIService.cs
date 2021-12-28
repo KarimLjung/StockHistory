@@ -24,7 +24,7 @@ namespace AL
             {
                 {"region", "US" },
                 {"lang", "en" },
-                {"symbols", "AAPL" }
+                {"symbols", ticker }
             };
 
             var responseMessage = await client.GetAsync(
@@ -35,8 +35,15 @@ namespace AL
                 var tickerString =
                     await responseMessage.Content.ReadAsStringAsync();
                 var yahooStockInfo = JsonSerializer.Deserialize<YahooStockInfo>(tickerString);
-                var tickerInfo = yahooStockInfo?.quoteResponse?.result?.Select(f => new TickerInfo { StockName = f.shortName, Id = Guid.NewGuid().ToString()} ).First();
-                
+                var tickerInfo = yahooStockInfo?.quoteResponse?.result?.
+                    Select(f => new TickerInfo { 
+                        Ticker = ticker,
+                        StockName = f.shortName, 
+                        Id = Guid.NewGuid().ToString(),
+                        LatestPrice = f.regularMarketPrice,
+                        LatestPriceDate = DateTime.UtcNow
+                    }).First();
+
                 return tickerInfo;
             }
 
