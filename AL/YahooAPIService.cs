@@ -35,7 +35,7 @@ namespace AL
                 var tickerString =
                     await responseMessage.Content.ReadAsStringAsync();
                 var yahooStockInfo = JsonSerializer.Deserialize<YahooStockInfo>(tickerString);
-                var tickerInfo = yahooStockInfo?.quoteResponse?.result?.Select(f => new TickerInfo { StockName = f.shortName} ).First();
+                var tickerInfo = yahooStockInfo?.quoteResponse?.result?.Select(f => new TickerInfo { StockName = f.shortName, Id = Guid.NewGuid().ToString()} ).First();
                 
                 return tickerInfo;
             }

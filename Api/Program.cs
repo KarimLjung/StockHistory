@@ -17,6 +17,7 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddHttpClient();
 builder.Services.AddScoped<IYahooAPIService, YahooAPIService>();
 builder.Services.AddScoped<ITickerService, TickerService>();
+builder.Services.AddScoped<IStockRepository, StockRepository>();
 
 builder.Services.AddDbContext<StockInfoDbContext>(
     options => options.UseSqlServer(
