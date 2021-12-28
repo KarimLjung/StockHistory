@@ -2,6 +2,6 @@
 {
     public interface IYahooAPIService
     {
-        Task<string> GetStockInformationForTicker(string ticker);
+        Task<TickerInfo> GetStockInformationForTicker(string ticker);
     }
 }

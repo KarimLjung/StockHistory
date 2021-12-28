@@ -5,17 +5,18 @@ namespace Api.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    public class WeatherForecastController : ControllerBase
+    [Produces("application/json")]
+    public class StockInformationController : ControllerBase
     {
         private static readonly string[] Summaries = new[]
         {
         "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
     };
 
-        private readonly ILogger<WeatherForecastController> _logger;
+        private readonly ILogger<StockInformationController> _logger;
         private readonly ITickerService _tickerService;
 
-        public WeatherForecastController(ILogger<WeatherForecastController> logger,
+        public StockInformationController(ILogger<StockInformationController> logger,
             ITickerService tickerService)
         {
             _logger = logger;

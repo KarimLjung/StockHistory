@@ -2,6 +2,9 @@
 using AL;
 using BLL;
 using Castle.Windsor;
+using DAL;
+using Microsoft.EntityFrameworkCore.SqlServer;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,6 +17,11 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddHttpClient();
 builder.Services.AddScoped<IYahooAPIService, YahooAPIService>();
 builder.Services.AddScoped<ITickerService, TickerService>();
+
+builder.Services.AddDbContext<StockInfoDbContext>(
+    options => options.UseSqlServer(
+        builder.Configuration.GetConnectionString("StockHistoryDatabase")));
+
 var app = builder.Build();
 
 
