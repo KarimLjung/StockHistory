@@ -18,9 +18,12 @@ builder.Services.AddHttpClient();
 builder.Services.AddScoped<IYahooAPIService, YahooAPIService>();
 builder.Services.AddScoped<ITickerService, TickerService>();
 builder.Services.AddScoped<IStockRepository, StockRepository>();
+builder.Services.AddScoped<StockhistoryContextProcedures, StockhistoryContextProcedures>();
 
 builder.Services.AddDbContext<StockInfoDbContext>(
     options => options.UseSqlServer(
+        builder.Configuration.GetConnectionString("StockHistoryDatabase")));
+builder.Services.AddDbContext<StockhistoryContext>(options => options.UseSqlServer(
         builder.Configuration.GetConnectionString("StockHistoryDatabase")));
 
 var app = builder.Build();

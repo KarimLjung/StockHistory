@@ -8,6 +8,7 @@ namespace BLL
 {
     public interface ITickerService
     {
-        Task<string> GetTickerInformation(string ticker);
+        Task<TickerInfo> GetTickerInformation(string ticker);
+        Task<IEnumerable<TickerInfos>> GetTickerInformations();
     }
 }

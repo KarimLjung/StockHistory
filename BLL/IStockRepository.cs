@@ -9,5 +9,6 @@ namespace BLL
     public interface IStockRepository
     {
         void CreateStockInfo(TickerInfo tickerInfo);
+        Task<IEnumerable<TickerInfos>> GetTickerInfoResults();
     }
 }

@@ -16,13 +16,18 @@ namespace BLL
             _yahooAPIService = yahooAPIService;
             this._stockRepository = stockRepository;
         }
-        
-        public async Task<string> GetTickerInformation(string ticker)
+
+        public async Task<TickerInfo> GetTickerInformation(string ticker)
         {
             var tickerInfo = await _yahooAPIService.GetStockInformationForTicker(ticker);
             _stockRepository.CreateStockInfo(tickerInfo);
 
-            return tickerInfo.StockName;
+            return tickerInfo;
+        }
+
+        public async Task<IEnumerable<TickerInfos>> GetTickerInformations()
+        {
+            return await _stockRepository.GetTickerInfoResults();
         }
     }
 }

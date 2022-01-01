@@ -23,11 +23,20 @@ namespace Api.Controllers
             this._tickerService = tickerService;
         }
 
-        [HttpGet(Name = "TickerInformation")]
-        public async Task<string> GetTickerInformation(string ticker)
+        [HttpGet]
+        [Route("/TickerInformation/{ticker}")]
+        public async Task<TickerInfo> GetTickerInformation(string ticker)
         {
-            var tickerString = await _tickerService.GetTickerInformation(ticker).ConfigureAwait(false);
-            return tickerString;
+            return await _tickerService.GetTickerInformation(ticker).ConfigureAwait(false);
         }
+
+        [HttpGet]
+        [Route("/TickerInformations/{ticker}")]
+        public async Task<IEnumerable<TickerInfos>> GetTickerInformations(string ticker)
+        {
+            var tickerInfos = await _tickerService.GetTickerInformations().ConfigureAwait(false);
+            return tickerInfos;
+        }
+
     }
 }
