@@ -38,5 +38,13 @@ namespace Api.Controllers
             return tickerInfos;
         }
 
+        [HttpPost]
+        [Route("/DoNothing/{ticker}")]
+        public async Task<string> GetNothing(string ticker)
+        {
+            var tickerInfos = "Hello world";
+            return tickerInfos;
+        }
+
     }
 }
