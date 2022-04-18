@@ -34,11 +34,11 @@ builder.Services.AddScoped<StockhistoryContextProcedures, StockhistoryContextPro
 
 builder.Services.AddHostedService<StartupBackgroundService>();
 builder.Services.AddSingleton<StartupHealthCheck>();
-builder.Services.AddSingleton<SqlConnectionHealthCheck>();
 builder.Services.AddHealthChecks()
     .AddCheck<StartupHealthCheck>(
         "Startup",
-        tags: new[] { "ready" });
+        tags: new[] { "ready" ,  "live" })
+    .AddSqlServer(builder.Configuration.GetConnectionString("StockHistoryDatabase"), tags: new[] {"ready"});
 
 builder.Services.AddDbContext<StockInfoDbContext>(
     options => options.UseSqlServer(
