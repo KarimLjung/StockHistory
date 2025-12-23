@@ -4,5 +4,6 @@ services:
   api:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://0.0.0.0:8080
     ports:
-      - "80"
+      - "8080:8080"
