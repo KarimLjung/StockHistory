@@ -27,7 +27,7 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddHttpClient();
 builder.Services.AddHealthChecks();
 
-builder.Services.AddScoped<IYahooAPIService, YahooAPIService>();
+builder.Services.AddScoped<IAlphaVantageApiService, AlphaVantageApiService>();
 builder.Services.AddScoped<ITickerService, TickerService>();
 builder.Services.AddScoped<IStockRepository, StockRepository>();
 builder.Services.AddScoped<StockhistoryContextProcedures, StockhistoryContextProcedures>();
@@ -94,4 +94,3 @@ app.MapControllers();
 
 
 app.Run();
-

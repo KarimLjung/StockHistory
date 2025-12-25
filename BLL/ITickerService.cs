@@ -9,6 +9,6 @@ namespace BLL
     public interface ITickerService
     {
         Task<TickerInfo> GetTickerInformation(string ticker);
-        Task<IEnumerable<TickerInfos>> GetTickerInformations();
+        Task<IEnumerable<TickerPrice>> GetTickerInformations(string ticker, DateTime startDate, DateTime endDate);
     }
 }

@@ -8,26 +8,26 @@ namespace BLL
 {
     public class TickerService : ITickerService
     {
-        private readonly IYahooAPIService _yahooAPIService;
+        private readonly IAlphaVantageApiService _alphaVantageApiService;
         private readonly IStockRepository _stockRepository;
 
-        public TickerService(IYahooAPIService yahooAPIService, IStockRepository stockRepository)
+        public TickerService(IAlphaVantageApiService alphaVantageApiService, IStockRepository stockRepository)
         {
-            _yahooAPIService = yahooAPIService;
+            _alphaVantageApiService = alphaVantageApiService;
             this._stockRepository = stockRepository;
         }
 
         public async Task<TickerInfo> GetTickerInformation(string ticker)
         {
-            var tickerInfo = await _yahooAPIService.GetStockInformationForTicker(ticker);
-            _stockRepository.CreateStockInfo(tickerInfo);
+            var tickerInfo = await _alphaVantageApiService.GetStockInformationForTicker(ticker);
+            //_stockRepository.CreateStockInfo(tickerInfo);
 
             return tickerInfo;
         }
 
-        public async Task<IEnumerable<TickerInfos>> GetTickerInformations()
+        public async Task<IEnumerable<TickerPrice>> GetTickerInformations(string ticker, DateTime startDate, DateTime endDate)
         {
-            return await _stockRepository.GetTickerInfoResults();
+            return await _alphaVantageApiService.GetStockInformationForTickerRange(ticker, startDate, endDate);
         }
     }
 }
