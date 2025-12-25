@@ -20,7 +20,7 @@ namespace BLL
         public async Task<TickerInfo> GetTickerInformation(string ticker)
         {
             var tickerInfo = await _yahooAPIService.GetStockInformationForTicker(ticker);
-            _stockRepository.CreateStockInfo(tickerInfo);
+            //_stockRepository.CreateStockInfo(tickerInfo);
 
             return tickerInfo;
         }
