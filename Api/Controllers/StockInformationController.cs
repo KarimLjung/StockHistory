@@ -32,10 +32,25 @@ namespace Api.Controllers
 
         [HttpGet]
         [Route("/TickerInformations/{ticker}")]
-        public async Task<IEnumerable<TickerInfos>> GetTickerInformations(string ticker)
+        public async Task<ActionResult<IEnumerable<TickerPrice>>> GetTickerInformations(
+            string ticker,
+            [FromQuery] DateTime startDate,
+            [FromQuery] DateTime endDate)
         {
-            var tickerInfos = await _tickerService.GetTickerInformations().ConfigureAwait(false);
-            return tickerInfos;
+            if (startDate == default || endDate == default)
+            {
+                return BadRequest("startDate and endDate are required (YYYY-MM-DD).");
+            }
+
+            if (startDate > endDate)
+            {
+                return BadRequest("startDate must be on or before endDate.");
+            }
+
+            var tickerInfos = await _tickerService
+                .GetTickerInformations(ticker, startDate, endDate)
+                .ConfigureAwait(false);
+            return Ok(tickerInfos);
         }
 
         [HttpPost]

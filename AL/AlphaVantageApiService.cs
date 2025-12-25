@@ -2,6 +2,8 @@
 using System.Text.Json;
 using Microsoft.Extensions.Logging;
 using System.Globalization;
+using System.Linq;
+using System.Collections.Generic;
 
 namespace AL
 {
@@ -59,6 +61,52 @@ namespace AL
             }
         }
 
+        public async Task<IEnumerable<TickerPrice>> GetStockInformationForTickerRange(
+            string ticker,
+            DateTime startDate,
+            DateTime endDate)
+        {
+            try
+            {
+                var client = _httpClientFactory.CreateClient();
+                client.DefaultRequestHeaders.Add("accept", "application/json");
+
+                var requestUrl =
+                    $"{AlphaVantageApiHost}?function=TIME_SERIES_DAILY_ADJUSTED&symbol={ticker}&outputsize=full&apikey={AlphaVantageApiKey}";
+                var responseMessage = await client.GetAsync(requestUrl);
+
+                if (responseMessage.IsSuccessStatusCode)
+                {
+                    var payload = await responseMessage.Content.ReadAsStringAsync();
+                    var prices = CreateTickerPricesFromAlphaVantage(ticker, payload, startDate, endDate);
+                    if (!prices.Any())
+                    {
+                        _logger.LogWarning(
+                            "AlphaVantage response returned no prices for {Ticker} between {StartDate} and {EndDate}. Body: {Body}",
+                            ticker,
+                            startDate,
+                            endDate,
+                            payload);
+                    }
+
+                    return prices;
+                }
+
+                var errorBody = await responseMessage.Content.ReadAsStringAsync();
+                _logger.LogWarning(
+                    "AlphaVantage API request failed for {Ticker}. Status: {StatusCode}. Body: {Body}",
+                    ticker,
+                    responseMessage.StatusCode,
+                    errorBody);
+                return Enumerable.Empty<TickerPrice>();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "AlphaVantage API request threw for {Ticker}", ticker);
+                return Enumerable.Empty<TickerPrice>();
+            }
+        }
+
         private static TickerInfo? CreateTickerInfoFromAlphaVantage(string ticker, string payload)
         {
             using var doc = JsonDocument.Parse(payload);
@@ -101,6 +149,63 @@ namespace AL
                 LatestPrice = price,
                 LatestPriceDate = priceDate
             };
+        }
+
+        private static IEnumerable<TickerPrice> CreateTickerPricesFromAlphaVantage(
+            string ticker,
+            string payload,
+            DateTime startDate,
+            DateTime endDate)
+        {
+            using var doc = JsonDocument.Parse(payload);
+            if (!doc.RootElement.TryGetProperty("Time Series (Daily)", out var series))
+            {
+                return Enumerable.Empty<TickerPrice>();
+            }
+
+            var start = startDate.Date;
+            var end = endDate.Date;
+            if (start > end)
+            {
+                var temp = start;
+                start = end;
+                end = temp;
+            }
+
+            var prices = new List<TickerPrice>();
+            foreach (var day in series.EnumerateObject())
+            {
+                if (!DateTime.TryParse(day.Name, CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal, out var dayDate))
+                {
+                    continue;
+                }
+
+                var date = dayDate.Date;
+                if (date < start || date > end)
+                {
+                    continue;
+                }
+
+                if (!day.Value.TryGetProperty("4. close", out var closeElement))
+                {
+                    continue;
+                }
+
+                var closeText = closeElement.GetString();
+                if (!decimal.TryParse(closeText, NumberStyles.Any, CultureInfo.InvariantCulture, out var close))
+                {
+                    continue;
+                }
+
+                prices.Add(new TickerPrice
+                {
+                    Ticker = ticker,
+                    Date = date,
+                    Close = close
+                });
+            }
+
+            return prices.OrderBy(p => p.Date);
         }
     }
 }

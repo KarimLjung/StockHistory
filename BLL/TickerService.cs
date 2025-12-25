@@ -25,9 +25,9 @@ namespace BLL
             return tickerInfo;
         }
 
-        public async Task<IEnumerable<TickerInfos>> GetTickerInformations()
+        public async Task<IEnumerable<TickerPrice>> GetTickerInformations(string ticker, DateTime startDate, DateTime endDate)
         {
-            return await _stockRepository.GetTickerInfoResults();
+            return await _alphaVantageApiService.GetStockInformationForTickerRange(ticker, startDate, endDate);
         }
     }
 }
