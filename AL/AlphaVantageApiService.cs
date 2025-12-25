@@ -1,16 +1,18 @@
-﻿using System.Text.Json;
+﻿using BLL;
+using System.Text.Json;
+using Microsoft.Extensions.Logging;
 using System.Globalization;
 
 namespace AL
 {
-    public class YahooAPIService : IYahooAPIService
+    public class AlphaVantageApiService : IAlphaVantageApiService
     {
         private readonly IHttpClientFactory _httpClientFactory;
-        private readonly ILogger<YahooAPIService> _logger;
+        private readonly ILogger<AlphaVantageApiService> _logger;
 
         private const string AlphaVantageApiHost = "https://www.alphavantage.co/query";
         private const string AlphaVantageApiKey = "H2Q4AR4PGTGMV4D0";
-        public YahooAPIService(IHttpClientFactory httpClientFactory, ILogger<YahooAPIService> logger)
+        public AlphaVantageApiService(IHttpClientFactory httpClientFactory, ILogger<AlphaVantageApiService> logger)
         {
             _httpClientFactory = httpClientFactory;
             _logger = logger;

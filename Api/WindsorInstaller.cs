@@ -12,12 +12,12 @@ namespace Api
     {
         public void Install(IWindsorContainer container, IConfigurationStore store)
         {
-            container.Register(Component.For<IYahooAPIService>().ImplementedBy<YahooAPIService>().LifestyleTransient());
+            container.Register(Component.For<IAlphaVantageApiService>().ImplementedBy<AlphaVantageApiService>().LifestyleTransient());
             container.Register(Component.For<ITickerService>().ImplementedBy<TickerService>().LifestyleTransient());
             container.Register(Component.For<IStockRepository>().ImplementedBy<IStockRepository>().LifestyleTransient());
             container.Register(Component.For<ControllerBase>().ImplementedBy<StockInformationController>().LifestyleTransient());
 
-            container.Register(Component.For<IYahooAPIService>().ImplementedBy<YahooAPIService>().LifestyleTransient());
+            container.Register(Component.For<IAlphaVantageApiService>().ImplementedBy<AlphaVantageApiService>().LifestyleTransient());
             container.Register(Component.For<ITickerService>().ImplementedBy<TickerService>().LifestyleTransient());
             container.Register(Component.For<IStockRepository>().ImplementedBy<IStockRepository>().LifestyleTransient());
             container.Register(Component.For<ControllerBase>().ImplementedBy<StockInformationController>().LifestyleTransient());

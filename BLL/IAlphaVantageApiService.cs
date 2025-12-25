@@ -1,6 +1,6 @@
 ﻿namespace BLL
 {
-    public interface IYahooAPIService
+    public interface IAlphaVantageApiService
     {
         Task<TickerInfo> GetStockInformationForTicker(string ticker);
     }
