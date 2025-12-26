@@ -27,6 +27,9 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddHttpClient();
 builder.Services.AddHealthChecks();
 
+builder.Services.Configure<AlphaVantageOptions>(
+    builder.Configuration.GetSection("AlphaVantage"));
+
 builder.Services.AddScoped<IAlphaVantageApiService, AlphaVantageApiService>();
 builder.Services.AddScoped<ITickerService, TickerService>();
 builder.Services.AddScoped<IStockRepository, StockRepository>();
