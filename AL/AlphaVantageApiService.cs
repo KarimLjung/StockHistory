@@ -1,9 +1,8 @@
-﻿using BLL;
-using System.Text.Json;
-using Microsoft.Extensions.Logging;
+﻿using System.Text.Json;
 using System.Globalization;
-using System.Linq;
-using System.Collections.Generic;
+using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Logging;
+using BLL;
 
 namespace AL
 {
@@ -11,13 +10,16 @@ namespace AL
     {
         private readonly IHttpClientFactory _httpClientFactory;
         private readonly ILogger<AlphaVantageApiService> _logger;
-
+        private readonly AlphaVantageOptions _options;
         private const string AlphaVantageApiHost = "https://www.alphavantage.co/query";
-        private const string AlphaVantageApiKey = "H2Q4AR4PGTGMV4D0";
-        public AlphaVantageApiService(IHttpClientFactory httpClientFactory, ILogger<AlphaVantageApiService> logger)
+        public AlphaVantageApiService(
+            IHttpClientFactory httpClientFactory, 
+            ILogger<AlphaVantageApiService> logger,
+            IOptions<AlphaVantageOptions> options)
         {
             _httpClientFactory = httpClientFactory;
             _logger = logger;
+            _options = options.Value;
         }
 
         public async Task<TickerInfo> GetStockInformationForTicker(string ticker)
@@ -28,7 +30,8 @@ namespace AL
                 client.DefaultRequestHeaders.Add("accept", "application/json");
 
                 var requestUrl =
-                    $"{AlphaVantageApiHost}?function=GLOBAL_QUOTE&symbol={ticker}&apikey={AlphaVantageApiKey}";
+                    // $"{AlphaVantageApiHost}?function=GLOBAL_QUOTE&symbol={ticker}&apikey={_options.ApiKey}";
+                 $"{AlphaVantageApiHost}?function=GLOBAL_QUOTE&symbol={ticker}&apikey={_options.ApiKey}";
                 var responseMessage = await client.GetAsync(requestUrl);
 
                 if (responseMessage.IsSuccessStatusCode)
@@ -72,7 +75,7 @@ namespace AL
                 client.DefaultRequestHeaders.Add("accept", "application/json");
 
                 var requestUrl =
-                    $"{AlphaVantageApiHost}?function=TIME_SERIES_DAILY_ADJUSTED&symbol={ticker}&outputsize=full&apikey={AlphaVantageApiKey}";
+                    $"{AlphaVantageApiHost}?function=TIME_SERIES_DAILY_ADJUSTED&symbol={ticker}&outputsize=full&apikey={_options.ApiKey}";
                 var responseMessage = await client.GetAsync(requestUrl);
 
                 if (responseMessage.IsSuccessStatusCode)
@@ -151,12 +154,13 @@ namespace AL
             };
         }
 
-        private static IEnumerable<TickerPrice> CreateTickerPricesFromAlphaVantage(
+        private IEnumerable<TickerPrice> CreateTickerPricesFromAlphaVantage(
             string ticker,
             string payload,
             DateTime startDate,
             DateTime endDate)
         {
+            
             using var doc = JsonDocument.Parse(payload);
             if (!doc.RootElement.TryGetProperty("Time Series (Daily)", out var series))
             {
@@ -172,16 +176,10 @@ namespace AL
                 end = temp;
             }
 
-            var prices = new List<TickerPrice>();
+            var allPrices = new List<TickerPrice>();
             foreach (var day in series.EnumerateObject())
             {
                 if (!DateTime.TryParse(day.Name, CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal, out var dayDate))
-                {
-                    continue;
-                }
-
-                var date = dayDate.Date;
-                if (date < start || date > end)
                 {
                     continue;
                 }
@@ -197,15 +195,47 @@ namespace AL
                     continue;
                 }
 
-                prices.Add(new TickerPrice
+                allPrices.Add(new TickerPrice
                 {
                     Ticker = ticker,
-                    Date = date,
+                    Date = dayDate.Date,
                     Close = close
                 });
             }
 
-            return prices.OrderBy(p => p.Date);
+            if (allPrices.Count == 0)
+            {
+                return Enumerable.Empty<TickerPrice>();
+            }
+
+            var minDate = allPrices.Min(p => p.Date);
+            var maxDate = allPrices.Max(p => p.Date);
+
+            if (start < minDate)
+            {
+                start = minDate;
+            }
+            if (end < minDate)
+            {
+                end = minDate;
+            }
+            if (start > maxDate)
+            {
+                start = maxDate;
+            }
+            if (end > maxDate)
+            {
+                end = maxDate;
+            }
+            if (start > end)
+            {
+                start = end;
+            }
+            _logger.LogWarning("Count of allPrices: " + allPrices.Count);
+
+            return allPrices
+                .Where(p => p.Date >= start && p.Date <= end)
+                .OrderBy(p => p.Date);
         }
     }
 }

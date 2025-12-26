@@ -4,5 +4,6 @@ services:
   api:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
+      - AlphaVantage__ApiKey=
     ports:
       - "8080:8080"
